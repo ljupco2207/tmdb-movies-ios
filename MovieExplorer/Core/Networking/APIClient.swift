@@ -6,7 +6,11 @@ nonisolated enum APIError: Error, Equatable {
     case decoding
 }
 
-nonisolated final class APIClient: Sendable {
+nonisolated protocol APIClientProtocol: Sendable {
+    func request<T: Decodable & Sendable>(_ endpoint: Endpoint) async throws -> T
+}
+
+nonisolated final class APIClient: APIClientProtocol {
     private let session: NetworkSession
 
     init(session: NetworkSession = URLSession.shared) {
