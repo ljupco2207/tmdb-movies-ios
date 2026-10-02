@@ -5,8 +5,8 @@
 //  Created by Ljupcho Gjorgjiev on 02/10/2026.
 //
 
-import Testing
 @testable import MovieExplorer
+import Testing
 
 struct MovieExplorerTests {
 
@@ -15,5 +15,4 @@ struct MovieExplorerTests {
         // Swift Testing Documentation
         // https://developer.apple.com/documentation/testing
     }
-
 }

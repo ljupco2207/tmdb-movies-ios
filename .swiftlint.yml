@@ -1,0 +1,27 @@
+included:
+  - MovieExplorer
+  - MovieExplorerTests
+  - MovieExplorerUITests
+
+# Default rules stay on; these opt-in rules add safety and consistency.
+opt_in_rules:
+  # Safety
+  - force_unwrapping                      # no `!` crashes
+  - fatal_error_message                   # fatalError must explain why
+  # Idiomatic Swift
+  - empty_count                           # isEmpty instead of count == 0
+  - empty_string                          # isEmpty instead of == ""
+  - first_where                           # first(where:) instead of filter{}.first
+  - last_where                            # last(where:) instead of filter{}.last
+  - toggle_bool                           # x.toggle() instead of x = !x
+  # Style
+  - sorted_imports                        # consistent imports
+  - modifier_order                        # e.g. `private static`, never `static private`
+  - vertical_whitespace_closing_braces    # no empty line before }
+  # SwiftUI
+  - private_swiftui_state                 # @State must be private
+
+line_length:
+  warning: 140              # default 120 is tight for SwiftUI modifier chains
+  error: 200
+  ignores_urls: true
