@@ -1,10 +1,3 @@
-//
-//  MovieExplorerUITests.swift
-//  MovieExplorerUITests
-//
-//  Created by Ljupcho Gjorgjiev on 02/10/2026.
-//
-
 import XCTest
 
 final class MovieExplorerUITests: XCTestCase {

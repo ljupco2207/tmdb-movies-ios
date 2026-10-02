@@ -1,10 +1,3 @@
-//
-//  MovieExplorerTests.swift
-//  MovieExplorerTests
-//
-//  Created by Ljupcho Gjorgjiev on 02/10/2026.
-//
-
 @testable import MovieExplorer
 import Testing
 
