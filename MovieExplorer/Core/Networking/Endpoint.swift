@@ -3,6 +3,7 @@ import Foundation
 nonisolated enum Endpoint: Sendable {
     case trending(page: Int)
     case movieDetails(id: Int)
+    case tvDetails(id: Int)
     case searchMovies(query: String)
     case searchTV(query: String)
 
@@ -12,6 +13,8 @@ nonisolated enum Endpoint: Sendable {
             "/trending/movie/week"
         case .movieDetails(let id):
             "/movie/\(id)"
+        case .tvDetails(let id):
+            "/tv/\(id)"
         case .searchMovies:
             "/search/movie"
         case .searchTV:
@@ -23,7 +26,7 @@ nonisolated enum Endpoint: Sendable {
         switch self {
         case .trending(let page):
             [URLQueryItem(name: "page", value: String(page))]
-        case .movieDetails:
+        case .movieDetails, .tvDetails:
             [URLQueryItem(name: "append_to_response", value: "credits")]
         case .searchMovies(let query), .searchTV(let query):
             [URLQueryItem(name: "query", value: query)]

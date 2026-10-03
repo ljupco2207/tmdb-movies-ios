@@ -40,4 +40,14 @@ enum SampleResponses {
       }
     }
     """
+
+    static let seriesDetails = """
+    {
+      "id": 2, "name": "Dark", "overview": "Story", "backdrop_path": null, "first_air_date": "2017-12-01",
+      "number_of_seasons": 3, "number_of_episodes": 26, "status": "Ended",
+      "vote_average": 8.4, "vote_count": 1, "genres": [],
+      "created_by": [{"name": "Baran bo Odar"}, {"name": "Jantje Friese"}],
+      "credits": {"cast": [], "crew": []}
+    }
+    """
 }

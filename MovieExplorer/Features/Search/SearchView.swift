@@ -9,11 +9,7 @@ struct SearchView: View {
 
     var body: some View {
         List(viewModel.results) { result in
-            if viewModel.resultsType == .movie {
-                NavigationLink(value: MovieRoute(id: result.id)) {
-                    SearchResultRow(result: result)
-                }
-            } else {
+            NavigationLink(value: MediaRoute(id: result.id, type: viewModel.resultsType)) {
                 SearchResultRow(result: result)
             }
         }

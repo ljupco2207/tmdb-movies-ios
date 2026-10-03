@@ -1,18 +1,31 @@
-nonisolated struct MovieDetails: Decodable, Sendable {
+nonisolated struct MediaDetails: Decodable, Sendable, MediaDisplayable {
     let id: Int
-    let title: String
     let tagline: String?
     let overview: String
     let backdropPath: String?
-    let releaseDate: String?
-    let runtime: Int?
     let status: String?
     let voteAverage: Double
     let voteCount: Int
     let genres: [Genre]
     let credits: Credits
 
+    // Movie
+    let title: String?
+    let releaseDate: String?
+    let runtime: Int?
+
+    // Series
+    let name: String?
+    let firstAirDate: String?
+    let numberOfSeasons: Int?
+    let numberOfEpisodes: Int?
+    let createdBy: [Creator]?
+
     nonisolated struct Genre: Decodable, Sendable {
+        let name: String
+    }
+
+    nonisolated struct Creator: Decodable, Sendable {
         let name: String
     }
 
@@ -36,15 +49,24 @@ nonisolated struct MovieDetails: Decodable, Sendable {
     }
 }
 
-nonisolated extension MovieDetails {
-    var year: String? {
-        guard let releaseDate, releaseDate.count >= 4 else { return nil }
-        return String(releaseDate.prefix(4))
-    }
-
+nonisolated extension MediaDetails {
     var runtimeText: String? {
         guard let runtime, runtime > 0 else { return nil }
         return runtime >= 60 ? "\(runtime / 60)h \(runtime % 60)m" : "\(runtime)m"
+    }
+
+    var seasonsText: String? {
+        guard let numberOfSeasons, numberOfSeasons > 0 else { return nil }
+        return "\(numberOfSeasons) \(numberOfSeasons == 1 ? "season" : "seasons")"
+    }
+
+    var episodesText: String? {
+        guard let numberOfEpisodes, numberOfEpisodes > 0 else { return nil }
+        return "\(numberOfEpisodes) \(numberOfEpisodes == 1 ? "episode" : "episodes")"
+    }
+
+    var creators: [String] {
+        (createdBy ?? []).map(\.name).uniqued()
     }
 
     var directors: [String] {

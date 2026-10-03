@@ -15,14 +15,14 @@ struct TrendingView: View {
             MovieCollectionView(
                 movies: viewModel.movies,
                 onReachEnd: loadNextPage,
-                onSelect: { path.append(MovieRoute(id: $0.id)) },
+                onSelect: { path.append(MediaRoute(id: $0.id, type: .movie)) },
                 footer: { PagingFooter(viewModel: viewModel, retry: loadNextPage) }
             )
             .ignoresSafeArea()
             .overlay { loadingOrError }
             .navigationTitle("Trending")
-            .navigationDestination(for: MovieRoute.self) { route in
-                DetailsView(movieID: route.id, api: api)
+            .navigationDestination(for: MediaRoute.self) { route in
+                DetailsView(route: route, api: api)
             }
             .navigationDestination(for: SearchRoute.self) { _ in
                 SearchView(api: api)

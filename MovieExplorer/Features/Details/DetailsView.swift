@@ -3,8 +3,8 @@ import SwiftUI
 struct DetailsView: View {
     @State private var viewModel: DetailsViewModel
 
-    init(movieID: Int, api: APIClientProtocol) {
-        _viewModel = State(initialValue: DetailsViewModel(movieID: movieID, api: api))
+    init(route: MediaRoute, api: APIClientProtocol) {
+        _viewModel = State(initialValue: DetailsViewModel(id: route.id, type: route.type, api: api))
     }
 
     var body: some View {
@@ -24,13 +24,13 @@ struct DetailsView: View {
             }
         case .loaded(let details):
             DetailsContent(details: details)
-                .navigationTitle(details.title)
+                .navigationTitle(details.displayTitle)
         }
     }
 }
 
 private struct DetailsContent: View {
-    let details: MovieDetails
+    let details: MediaDetails
 
     var body: some View {
         ScrollView {
@@ -41,6 +41,7 @@ private struct DetailsContent: View {
                 VStack(alignment: .leading, spacing: 20) {
                     header
                     InfoSection(title: "Overview", text: details.overview)
+                    InfoSection(title: "Created by", text: details.creators.joined(separator: ", "))
                     InfoSection(title: "Directed by", text: details.directors.joined(separator: ", "))
                     InfoSection(title: "Written by", text: details.writers.joined(separator: ", "))
                     cast
@@ -53,7 +54,7 @@ private struct DetailsContent: View {
 
     private var header: some View {
         VStack(alignment: .leading, spacing: 8) {
-            Text(details.title)
+            Text(details.displayTitle)
                 .font(.title.bold())
 
             if let tagline = details.tagline, !tagline.isEmpty {
@@ -71,7 +72,7 @@ private struct DetailsContent: View {
                     .foregroundStyle(.secondary)
             }
 
-            let facts = [details.year, details.runtimeText, details.status].compactMap { $0 }
+            let facts = [details.year, details.runtimeText, details.seasonsText, details.episodesText, details.status].compactMap { $0 }
             if !facts.isEmpty {
                 Text(facts.joined(separator: " · "))
                     .foregroundStyle(.secondary)
