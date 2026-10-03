@@ -9,15 +9,17 @@ struct TrendingView: View {
 
     var body: some View {
         NavigationStack {
-            MovieCollectionView(movies: viewModel.movies)
-                .ignoresSafeArea()
-                .overlay { loadingOrError }
-                .navigationTitle("Trending")
-                .task {
-                    if viewModel.movies.isEmpty {
-                        await viewModel.load()
-                    }
+            MovieCollectionView(movies: viewModel.movies, onReachEnd: loadNextPage) {
+                PagingFooter(viewModel: viewModel, retry: loadNextPage)
+            }
+            .ignoresSafeArea()
+            .overlay { loadingOrError }
+            .navigationTitle("Trending")
+            .task {
+                if viewModel.movies.isEmpty {
+                    await viewModel.loadNextPage()
                 }
+            }
         }
     }
 
@@ -28,11 +30,28 @@ struct TrendingView: View {
                 ContentUnavailableView {
                     Label(errorMessage, systemImage: "wifi.exclamationmark")
                 } actions: {
-                    Button("Retry") {
-                        Task { await viewModel.load() }
-                    }
+                    Button("Retry", action: loadNextPage)
                 }
             } else {
+                ProgressView()
+            }
+        }
+    }
+
+    private func loadNextPage() {
+        Task { await viewModel.loadNextPage() }
+    }
+}
+
+private struct PagingFooter: View {
+    let viewModel: TrendingViewModel
+    let retry: () -> Void
+
+    var body: some View {
+        if !viewModel.movies.isEmpty {
+            if viewModel.errorMessage != nil {
+                Button("Retry", action: retry)
+            } else if viewModel.hasMorePages {
                 ProgressView()
             }
         }
