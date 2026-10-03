@@ -49,6 +49,25 @@ final class MovieExplorerUITests: XCTestCase {
         XCTAssertEqual(title.label, "Series 2")
     }
 
+    func testFavoritingMovieShowsItInFavoritesAndOnCard() {
+        let app = launchApp()
+
+        let movie = app.staticTexts["Movie 101"]
+        XCTAssertTrue(movie.waitForExistence(timeout: 5))
+        movie.tap()
+        let addButton = app.buttons["Add to favorites"]
+        XCTAssertTrue(addButton.waitForExistence(timeout: 5))
+        addButton.tap()
+        XCTAssertTrue(app.buttons["Remove from favorites"].exists)
+
+        app.navigationBars.buttons["Trending"].tap()
+        XCTAssertTrue(app.images["Favorite"].waitForExistence(timeout: 5))
+
+        app.buttons["Favorites"].tap()
+        XCTAssertTrue(app.navigationBars["Favorites"].waitForExistence(timeout: 5))
+        XCTAssertTrue(app.staticTexts["Movie 101"].exists)
+    }
+
     /// Recorded with Xcode's recorder, then cleaned up: stub data, stable queries and assertions.
     func testRecordedFlow() {
         let app = launchApp()

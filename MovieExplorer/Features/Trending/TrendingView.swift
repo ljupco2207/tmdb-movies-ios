@@ -2,11 +2,13 @@ import SwiftUI
 
 struct TrendingView: View {
     private let api: APIClientProtocol
+    private let favorites: FavoritesStore
     @State private var viewModel: TrendingViewModel
     @State private var path = NavigationPath()
 
-    init(api: APIClientProtocol) {
+    init(api: APIClientProtocol, favorites: FavoritesStore) {
         self.api = api
+        self.favorites = favorites
         _viewModel = State(initialValue: TrendingViewModel(api: api))
     }
 
@@ -14,6 +16,7 @@ struct TrendingView: View {
         NavigationStack(path: $path) {
             MovieCollectionView(
                 movies: viewModel.movies,
+                favorites: favorites,
                 onReachEnd: loadNextPage,
                 onSelect: { path.append(MediaRoute(id: $0.id, type: .movie)) },
                 footer: { PagingFooter(viewModel: viewModel, retry: loadNextPage) }
@@ -22,12 +25,21 @@ struct TrendingView: View {
             .overlay { loadingOrError }
             .navigationTitle("Trending")
             .navigationDestination(for: MediaRoute.self) { route in
-                DetailsView(route: route, api: api)
+                DetailsView(route: route, api: api, favorites: favorites)
             }
             .navigationDestination(for: SearchRoute.self) { _ in
-                SearchView(api: api)
+                SearchView(api: api, favorites: favorites)
+            }
+            .navigationDestination(for: FavoritesRoute.self) { _ in
+                FavoritesView(favorites: favorites)
             }
             .toolbar {
+                ToolbarItem(placement: .topBarTrailing) {
+                    NavigationLink(value: FavoritesRoute()) {
+                        Image(systemName: "heart")
+                    }
+                    .accessibilityLabel("Favorites")
+                }
                 ToolbarItem(placement: .topBarTrailing) {
                     NavigationLink(value: SearchRoute()) {
                         Image(systemName: "magnifyingglass")

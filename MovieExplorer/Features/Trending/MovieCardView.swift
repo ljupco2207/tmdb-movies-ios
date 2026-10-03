@@ -2,11 +2,20 @@ import SwiftUI
 
 struct MovieCardView: View {
     let movie: Movie
+    let favorites: FavoritesStore
 
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
             TMDBImageView(path: movie.backdropPath, kind: .backdrop)
                 .aspectRatio(16 / 9, contentMode: .fit)
+                .overlay(alignment: .topTrailing) {
+                    if favorites.isFavorite(id: movie.id, type: .movie) {
+                        FavoriteBadge()
+                            .padding(8)
+                            .background(.regularMaterial, in: .circle)
+                            .padding(8)
+                    }
+                }
 
             VStack(alignment: .leading, spacing: 6) {
                 Text(movie.title)

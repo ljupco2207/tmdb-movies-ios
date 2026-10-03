@@ -36,6 +36,7 @@ struct DetailsViewModelTests {
             return
         }
         #expect(loaded.displayTitle == "Dark")
+        #expect(viewModel.favoriteItem == FavoriteItem(id: 2, type: .tv, title: "Dark", posterPath: nil, year: "2017"))
     }
 
     @Test func failureSetsFailedState() async {

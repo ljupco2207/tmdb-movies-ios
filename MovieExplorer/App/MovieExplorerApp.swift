@@ -1,9 +1,13 @@
 import Kingfisher
+import os
 import SwiftUI
 
 @main
 struct MovieExplorerApp: App {
+    private static let isUITesting = ProcessInfo.processInfo.arguments.contains("--uitesting")
+
     private let api = Self.makeAPI()
+    @State private var favorites = Self.makeFavorites()
     @State private var network = NetworkMonitor()
 
     init() {
@@ -13,7 +17,7 @@ struct MovieExplorerApp: App {
 
     var body: some Scene {
         WindowGroup {
-            TrendingView(api: api)
+            TrendingView(api: api, favorites: favorites)
                 .overlay(alignment: .bottom) {
                     if !network.isConnected {
                         OfflineBanner()
@@ -26,10 +30,24 @@ struct MovieExplorerApp: App {
 
     private static func makeAPI() -> APIClient {
         #if DEBUG
-        if ProcessInfo.processInfo.arguments.contains("--uitesting") {
+        if isUITesting {
             return APIClient(session: UITestNetworkSession(), cache: nil)
         }
         #endif
         return APIClient()
+    }
+
+    private static func makeFavorites() -> FavoritesStore {
+        do {
+            return try isUITesting ? .inMemory() : .persistent()
+        } catch {
+            Logger(subsystem: Bundle.main.bundleIdentifier ?? "MovieExplorer", category: "Favorites")
+                .error("Opening favorites failed, using memory only: \(error.localizedDescription, privacy: .public)")
+            do {
+                return try .inMemory()
+            } catch {
+                fatalError("Couldn't create an in-memory favorites store: \(error)")
+            }
+        }
     }
 }

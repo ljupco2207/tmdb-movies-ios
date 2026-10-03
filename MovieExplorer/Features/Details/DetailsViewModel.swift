@@ -10,6 +10,11 @@ final class DetailsViewModel {
 
     private(set) var state: State = .loading
 
+    var favoriteItem: FavoriteItem? {
+        guard case .loaded(let details) = state else { return nil }
+        return FavoriteItem(details: details, type: type)
+    }
+
     private let id: Int
     private let type: MediaType
     private let api: APIClientProtocol

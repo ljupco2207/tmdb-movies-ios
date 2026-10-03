@@ -2,15 +2,34 @@ import SwiftUI
 
 struct DetailsView: View {
     @State private var viewModel: DetailsViewModel
+    private let favorites: FavoritesStore
 
-    init(route: MediaRoute, api: APIClientProtocol) {
+    init(route: MediaRoute, api: APIClientProtocol, favorites: FavoritesStore) {
         _viewModel = State(initialValue: DetailsViewModel(id: route.id, type: route.type, api: api))
+        self.favorites = favorites
     }
 
     var body: some View {
         content
             .navigationBarTitleDisplayMode(.inline)
+            .toolbar { favoriteButton }
             .task { await viewModel.load() }
+    }
+
+    @ToolbarContentBuilder
+    private var favoriteButton: some ToolbarContent {
+        if let item = viewModel.favoriteItem {
+            ToolbarItem(placement: .topBarTrailing) {
+                let isFavorite = favorites.isFavorite(id: item.id, type: item.type)
+                Button {
+                    favorites.toggle(item)
+                } label: {
+                    Image(systemName: isFavorite ? "heart.fill" : "heart")
+                        .foregroundStyle(isFavorite ? .red : .primary)
+                }
+                .accessibilityLabel(isFavorite ? "Remove from favorites" : "Add to favorites")
+            }
+        }
     }
 
     @ViewBuilder

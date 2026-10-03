@@ -2,15 +2,23 @@ import SwiftUI
 
 struct SearchView: View {
     @State private var viewModel: SearchViewModel
+    private let favorites: FavoritesStore
 
-    init(api: APIClientProtocol) {
+    init(api: APIClientProtocol, favorites: FavoritesStore) {
         _viewModel = State(initialValue: SearchViewModel(api: api))
+        self.favorites = favorites
     }
 
     var body: some View {
         List(viewModel.results) { result in
             NavigationLink(value: MediaRoute(id: result.id, type: viewModel.resultsType)) {
-                SearchResultRow(result: result)
+                MediaRow(
+                    title: result.displayTitle,
+                    year: result.year,
+                    overview: result.overview,
+                    posterPath: result.posterPath,
+                    isFavorite: favorites.isFavorite(id: result.id, type: viewModel.resultsType)
+                )
             }
         }
         .listStyle(.plain)
@@ -46,35 +54,5 @@ struct SearchView: View {
                 ContentUnavailableView.search(text: viewModel.query)
             }
         }
-    }
-}
-
-private struct SearchResultRow: View {
-    let result: SearchResult
-
-    var body: some View {
-        HStack(alignment: .top, spacing: 12) {
-            TMDBImageView(path: result.posterPath, kind: .poster)
-                .frame(width: 60, height: 90)
-                .clipShape(.rect(cornerRadius: 6))
-
-            VStack(alignment: .leading, spacing: 4) {
-                Text(result.displayTitle)
-                    .font(.headline)
-                    .lineLimit(2)
-                if let year = result.year {
-                    Text(year)
-                        .font(.subheadline)
-                        .foregroundStyle(.secondary)
-                }
-                if !result.overview.isEmpty {
-                    Text(result.overview)
-                        .font(.footnote)
-                        .foregroundStyle(.secondary)
-                        .lineLimit(2)
-                }
-            }
-        }
-        .padding(.vertical, 4)
     }
 }

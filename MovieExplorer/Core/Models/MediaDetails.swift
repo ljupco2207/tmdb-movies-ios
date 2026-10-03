@@ -3,6 +3,7 @@ nonisolated struct MediaDetails: Decodable, Sendable, MediaDisplayable {
     let tagline: String?
     let overview: String
     let backdropPath: String?
+    let posterPath: String?
     let status: String?
     let voteAverage: Double
     let voteCount: Int

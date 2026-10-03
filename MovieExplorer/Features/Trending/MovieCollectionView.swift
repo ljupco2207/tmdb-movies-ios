@@ -5,6 +5,7 @@ import UIKit
 /// UICollectionView with a custom compositional layout and SwiftUI cells via UIHostingConfiguration.
 struct MovieCollectionView<Footer: View>: UIViewRepresentable {
     let movies: [Movie]
+    let favorites: FavoritesStore
     let onReachEnd: () -> Void
     let onSelect: (Movie) -> Void
     @ViewBuilder let footer: () -> Footer
@@ -80,8 +81,9 @@ struct MovieCollectionView<Footer: View>: UIViewRepresentable {
         }
 
         func configureDataSource(for collectionView: UICollectionView) {
+            let favorites = parent.favorites
             let cellRegistration = UICollectionView.CellRegistration<UICollectionViewCell, Movie> { cell, _, movie in
-                cell.contentConfiguration = UIHostingConfiguration { MovieCardView(movie: movie) }
+                cell.contentConfiguration = UIHostingConfiguration { MovieCardView(movie: movie, favorites: favorites) }
                     .margins(.all, 0)
             }
             // The footer reads observable state itself, so it updates without being reconfigured.
