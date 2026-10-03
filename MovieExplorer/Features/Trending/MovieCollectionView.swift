@@ -18,6 +18,7 @@ struct MovieCollectionView<Footer: View>: UIViewRepresentable {
     func makeUIView(context: Context) -> UICollectionView {
         let collectionView = UICollectionView(frame: .zero, collectionViewLayout: Self.makeLayout())
         collectionView.backgroundColor = .systemGroupedBackground
+        collectionView.accessibilityIdentifier = "trending.list"
         collectionView.delegate = context.coordinator
         context.coordinator.configureDataSource(for: collectionView)
         return collectionView

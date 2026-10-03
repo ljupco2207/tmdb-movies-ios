@@ -58,6 +58,7 @@ private struct DetailsContent: View {
         VStack(alignment: .leading, spacing: 8) {
             Text(details.displayTitle)
                 .font(.title.bold())
+                .accessibilityIdentifier("details.title")
 
             if let tagline = details.tagline, !tagline.isEmpty {
                 Text(tagline)

@@ -1,37 +1,82 @@
 import XCTest
 
+@MainActor
 final class MovieExplorerUITests: XCTestCase {
+    func testOpeningTrendingMovieShowsDetails() {
+        let app = launchApp()
 
-    override func setUpWithError() throws {
-        // Put setup code here. This method is called before the invocation of each test method in the class.
+        let movie = app.staticTexts["Movie 101"]
+        XCTAssertTrue(movie.waitForExistence(timeout: 5))
+        movie.tap()
 
-        // In UI tests it is usually best to stop immediately when a failure occurs.
-        continueAfterFailure = false
+        let title = app.staticTexts["details.title"]
+        XCTAssertTrue(title.waitForExistence(timeout: 5))
+        XCTAssertEqual(title.label, "Movie 101")
 
-        // In UI tests it’s important to set the initial state - such as interface orientation - required for your tests
-        // before they run. The setUp method is a good place to do this.
+        app.navigationBars.buttons["Trending"].tap()
+        XCTAssertTrue(movie.waitForExistence(timeout: 5))
     }
 
-    override func tearDownWithError() throws {
-        // Put teardown code here. This method is called after the invocation of each test method in the class.
-    }
+    func testScrollingTrendingLoadsNextPage() {
+        let app = launchApp()
+        let list = app.collectionViews["trending.list"]
+        XCTAssertTrue(app.staticTexts["Movie 101"].waitForExistence(timeout: 5))
 
-    @MainActor
-    func testExample() throws {
-        // UI tests must launch the application that they test.
-        let app = XCUIApplication()
-        app.launch()
-
-        // Use XCTAssert and related functions to verify your tests produce the correct results.
-        // XCUIAutomation Documentation
-        // https://developer.apple.com/documentation/xcuiautomation
-    }
-
-    @MainActor
-    func testLaunchPerformance() throws {
-        // This measures how long it takes to launch your application.
-        measure(metrics: [XCTApplicationLaunchMetric()]) {
-            XCUIApplication().launch()
+        let nextPageMovie = app.staticTexts["Movie 201"]
+        for _ in 0..<15 where !nextPageMovie.exists {
+            list.swipeUp()
         }
+        XCTAssertTrue(nextPageMovie.exists)
+    }
+
+    func testSearchingSeriesOpensDetails() {
+        let app = launchApp()
+
+        app.buttons["Search"].tap()
+        let searchField = app.searchFields["Search"]
+        XCTAssertTrue(searchField.waitForExistence(timeout: 5))
+        searchField.tap()
+        searchField.typeText("dark")
+        XCTAssertTrue(app.staticTexts["dark Movie"].waitForExistence(timeout: 5))
+
+        app.buttons["Series"].tap()
+        let series = app.staticTexts["dark Series"]
+        XCTAssertTrue(series.waitForExistence(timeout: 5))
+        series.tap()
+
+        let title = app.staticTexts["details.title"]
+        XCTAssertTrue(title.waitForExistence(timeout: 5))
+        XCTAssertEqual(title.label, "Series 2")
+    }
+
+    /// Recorded with Xcode's recorder, then cleaned up: stub data, stable queries and assertions.
+    func testRecordedFlow() {
+        let app = launchApp()
+        let list = app.collectionViews["trending.list"]
+        XCTAssertTrue(app.staticTexts["Movie 101"].waitForExistence(timeout: 5))
+
+        list.swipeUp()
+        list.cells.firstMatch.tap()
+        XCTAssertTrue(app.staticTexts["details.title"].waitForExistence(timeout: 5))
+        app.navigationBars.buttons["Trending"].tap()
+
+        app.buttons["Search"].tap()
+        let searchField = app.searchFields["Search"]
+        XCTAssertTrue(searchField.waitForExistence(timeout: 5))
+        searchField.tap()
+        searchField.typeText("a")
+        XCTAssertTrue(app.staticTexts["a Movie"].waitForExistence(timeout: 5))
+
+        app.buttons["Close"].tap()
+        app.navigationBars.buttons["Trending"].tap()
+        XCTAssertTrue(list.waitForExistence(timeout: 5))
+    }
+
+    private func launchApp() -> XCUIApplication {
+        continueAfterFailure = false
+        let app = XCUIApplication()
+        app.launchArguments = ["--uitesting"]
+        app.launch()
+        return app
     }
 }
