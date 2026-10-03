@@ -1,5 +1,6 @@
 import XCTest
 
+#if !os(tvOS)
 @MainActor
 final class MovieExplorerUITests: XCTestCase {
     func testOpeningTrendingMovieShowsDetails() {
@@ -99,3 +100,4 @@ final class MovieExplorerUITests: XCTestCase {
         return app
     }
 }
+#endif

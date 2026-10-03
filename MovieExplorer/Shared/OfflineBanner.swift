@@ -6,7 +6,7 @@ struct OfflineBanner: View {
             .font(.footnote.weight(.semibold))
             .padding(.horizontal, 14)
             .padding(.vertical, 8)
-            .background(.regularMaterial, in: .capsule)
+            .glassBackground()
             .padding(.bottom, 8)
     }
 }

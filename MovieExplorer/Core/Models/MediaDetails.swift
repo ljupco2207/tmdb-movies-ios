@@ -58,12 +58,12 @@ nonisolated extension MediaDetails {
 
     var seasonsText: String? {
         guard let numberOfSeasons, numberOfSeasons > 0 else { return nil }
-        return "\(numberOfSeasons) \(numberOfSeasons == 1 ? "season" : "seasons")"
+        return numberOfSeasons.counted("season")
     }
 
     var episodesText: String? {
         guard let numberOfEpisodes, numberOfEpisodes > 0 else { return nil }
-        return "\(numberOfEpisodes) \(numberOfEpisodes == 1 ? "episode" : "episodes")"
+        return numberOfEpisodes.counted("episode")
     }
 
     var creators: [String] {

@@ -24,13 +24,13 @@ struct TrendingView: View {
         .overlay { loadingOrError }
         .navigationTitle("Trending")
         .toolbar {
-            ToolbarItem(placement: .topBarTrailing) {
+            ToolbarItem(placement: .trailingBar) {
                 NavigationLink(value: FavoritesRoute()) {
                     Image(systemName: "heart")
                 }
                 .accessibilityLabel("Favorites")
             }
-            ToolbarItem(placement: .topBarTrailing) {
+            ToolbarItem(placement: .trailingBar) {
                 NavigationLink(value: SearchRoute()) {
                     Image(systemName: "magnifyingglass")
                 }

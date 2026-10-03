@@ -24,7 +24,7 @@ struct SearchView: View {
         .listStyle(.plain)
         .searchable(
             text: $viewModel.query,
-            placement: .navigationBarDrawer(displayMode: .always), prompt: "Search"
+            placement: .alwaysVisible, prompt: "Search"
         )
         .safeAreaInset(edge: .top) {
             Picker("Type", selection: $viewModel.mediaType) {
@@ -34,11 +34,11 @@ struct SearchView: View {
             .pickerStyle(.segmented)
             .padding(.horizontal)
             .padding(.bottom, 8)
-            .background(.bar)
+            .barBackground()
         }
         .overlay { emptyState }
         .navigationTitle("Search")
-        .navigationBarTitleDisplayMode(.inline)
+        .inlineNavigationTitle()
     }
 
     @ViewBuilder

@@ -11,7 +11,7 @@ struct DetailsView: View {
 
     var body: some View {
         content
-            .navigationBarTitleDisplayMode(.inline)
+            .inlineNavigationTitle()
             .toolbar { favoriteButton }
             .task { await viewModel.load() }
     }
@@ -19,7 +19,7 @@ struct DetailsView: View {
     @ToolbarContentBuilder
     private var favoriteButton: some ToolbarContent {
         if let item = viewModel.favoriteItem {
-            ToolbarItem(placement: .topBarTrailing) {
+            ToolbarItem(placement: .trailingBar) {
                 let isFavorite = favorites.isFavorite(id: item.id, type: item.type)
                 Button {
                     favorites.toggle(item)
@@ -56,9 +56,14 @@ private struct DetailsContent: View {
             VStack(alignment: .leading, spacing: 16) {
                 TMDBImageView(path: details.backdropPath, kind: .backdrop)
                     .aspectRatio(16 / 9, contentMode: .fit)
+                    .overlay(alignment: .bottomLeading) {
+                        RatingBadge(average: details.voteAverage, count: details.voteCount)
+                            .padding()
+                    }
 
                 VStack(alignment: .leading, spacing: 20) {
                     header
+                        .focusableOnTV()
                     InfoSection(title: "Overview", text: details.overview)
                     InfoSection(title: "Created by", text: details.creators.joined(separator: ", "))
                     InfoSection(title: "Directed by", text: details.directors.joined(separator: ", "))
@@ -82,15 +87,6 @@ private struct DetailsContent: View {
             if let tagline = details.tagline, !tagline.isEmpty {
                 Text(tagline)
                     .italic()
-                    .foregroundStyle(.secondary)
-            }
-
-            HStack(spacing: 4) {
-                Image(systemName: "star.fill")
-                    .foregroundStyle(.yellow)
-                Text(details.voteAverage, format: .number.precision(.fractionLength(1)))
-                    .bold()
-                Text("(\(details.voteCount.formatted()) \(details.voteCount == 1 ? "vote" : "votes"))")
                     .foregroundStyle(.secondary)
             }
 
@@ -128,7 +124,28 @@ private struct DetailsContent: View {
                     .font(.subheadline)
                 }
             }
+            .focusableOnTV()
         }
+    }
+}
+
+private struct RatingBadge: View {
+    let average: Double
+    let count: Int
+
+    var body: some View {
+        HStack(spacing: 4) {
+            Image(systemName: "star.fill")
+                .foregroundStyle(.yellow)
+            Text(average, format: .number.precision(.fractionLength(1)))
+                .bold()
+            Text("(\(count.counted("vote")))")
+                .foregroundStyle(.secondary)
+        }
+        .font(.subheadline)
+        .padding(.horizontal, 12)
+        .padding(.vertical, 6)
+        .glassBackground()
     }
 }
 
@@ -144,6 +161,7 @@ private struct InfoSection: View {
                 Text(text)
                     .foregroundStyle(.secondary)
             }
+            .focusableOnTV()
         }
     }
 }

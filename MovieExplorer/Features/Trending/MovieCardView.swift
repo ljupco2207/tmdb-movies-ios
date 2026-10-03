@@ -12,7 +12,7 @@ struct MovieCardView: View {
                     if favorites.isFavorite(id: movie.id, type: .movie) {
                         FavoriteBadge()
                             .padding(8)
-                            .background(.regularMaterial, in: .circle)
+                            .glassBackground(in: .circle)
                             .padding(8)
                     }
                 }
@@ -30,7 +30,7 @@ struct MovieCardView: View {
             .frame(maxWidth: .infinity, alignment: .leading)
             .padding(12)
         }
-        .background(Color(.secondarySystemGroupedBackground))
+        .background(Color(.cardBackground))
         .clipShape(.rect(cornerRadius: 12))
     }
 }

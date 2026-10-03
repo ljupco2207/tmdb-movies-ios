@@ -19,7 +19,7 @@ struct MovieCollectionView<Footer: View>: UIViewRepresentable {
 
     func makeUIView(context: Context) -> UICollectionView {
         let collectionView = UICollectionView(frame: .zero, collectionViewLayout: Self.makeLayout())
-        collectionView.backgroundColor = .systemGroupedBackground
+        collectionView.backgroundColor = .screenBackground
         collectionView.accessibilityIdentifier = "trending.list"
         collectionView.delegate = context.coordinator
         collectionView.prefetchDataSource = context.coordinator
@@ -85,6 +85,15 @@ struct MovieCollectionView<Footer: View>: UIViewRepresentable {
             let cellRegistration = UICollectionView.CellRegistration<UICollectionViewCell, Movie> { cell, _, movie in
                 cell.contentConfiguration = UIHostingConfiguration { MovieCardView(movie: movie, favorites: favorites) }
                     .margins(.all, 0)
+                #if os(tvOS)
+                // The focused card grows, so it's clear what the remote selects.
+                cell.configurationUpdateHandler = { cell, state in
+                    let scale: CGFloat = state.isFocused ? 1.06 : 1
+                    UIView.animate(withDuration: 0.2) {
+                        cell.contentView.transform = CGAffineTransform(scaleX: scale, y: scale)
+                    }
+                }
+                #endif
             }
             // The footer reads observable state itself, so it updates without being reconfigured.
             let footerRegistration = UICollectionView.SupplementaryRegistration<UICollectionViewCell>(

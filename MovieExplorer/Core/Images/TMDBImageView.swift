@@ -39,7 +39,7 @@ struct TMDBImageView: View {
 
     private var placeholder: some View {
         Rectangle()
-            .fill(Color(.tertiarySystemFill))
+            .fill(Color(.placeholderFill))
             .overlay {
                 Image(systemName: "film")
                     .font(.title)
