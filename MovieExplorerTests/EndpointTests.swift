@@ -10,4 +10,9 @@ struct EndpointTests {
     @Test func movieDetailsURLIncludesCredits() {
         #expect(Endpoint.movieDetails(id: 42).url?.absoluteString == "https://api.themoviedb.org/3/movie/42?append_to_response=credits")
     }
+
+    @Test func searchURLsEncodeQuery() {
+        #expect(Endpoint.searchMovies(query: "star wars").url?.absoluteString == "https://api.themoviedb.org/3/search/movie?query=star%20wars")
+        #expect(Endpoint.searchTV(query: "dark").url?.absoluteString == "https://api.themoviedb.org/3/search/tv?query=dark")
+    }
 }

@@ -3,12 +3,13 @@ import SwiftUI
 
 struct TMDBImageView: View {
     let path: String?
+    let kind: TMDBImage.Kind
 
     @Environment(\.displayScale) private var displayScale
 
     var body: some View {
         GeometryReader { proxy in
-            KFImage(TMDBImage.backdropURL(path: path, pixelWidth: proxy.size.width * displayScale))
+            KFImage(TMDBImage.url(path: path, kind: kind, pixelWidth: proxy.size.width * displayScale))
                 .placeholder { placeholder }
                 .cancelOnDisappear(true)
                 .resizable()

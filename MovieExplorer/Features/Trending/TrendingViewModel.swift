@@ -23,7 +23,7 @@ final class TrendingViewModel {
         defer { isLoading = false }
 
         do {
-            let result: MoviePage = try await api.request(.trending(page: page + 1))
+            let result: Page<Movie> = try await api.request(.trending(page: page + 1))
             // Trending can repeat a movie across pages; duplicate IDs would crash the diffable data source.
             var seen = Set(movies.map(\.id))
             movies += result.results.filter { seen.insert($0.id).inserted }

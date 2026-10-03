@@ -3,7 +3,7 @@ import SwiftUI
 struct TrendingView: View {
     private let api: APIClientProtocol
     @State private var viewModel: TrendingViewModel
-    @State private var path: [Movie] = []
+    @State private var path = NavigationPath()
 
     init(api: APIClientProtocol) {
         self.api = api
@@ -15,14 +15,25 @@ struct TrendingView: View {
             MovieCollectionView(
                 movies: viewModel.movies,
                 onReachEnd: loadNextPage,
-                onSelect: { path.append($0) },
+                onSelect: { path.append(MovieRoute(id: $0.id)) },
                 footer: { PagingFooter(viewModel: viewModel, retry: loadNextPage) }
             )
             .ignoresSafeArea()
             .overlay { loadingOrError }
             .navigationTitle("Trending")
-            .navigationDestination(for: Movie.self) { movie in
-                DetailsView(movieID: movie.id, api: api)
+            .navigationDestination(for: MovieRoute.self) { route in
+                DetailsView(movieID: route.id, api: api)
+            }
+            .navigationDestination(for: SearchRoute.self) { _ in
+                SearchView(api: api)
+            }
+            .toolbar {
+                ToolbarItem(placement: .topBarTrailing) {
+                    NavigationLink(value: SearchRoute()) {
+                        Image(systemName: "magnifyingglass")
+                    }
+                    .accessibilityLabel("Search")
+                }
             }
             .task {
                 if viewModel.movies.isEmpty {

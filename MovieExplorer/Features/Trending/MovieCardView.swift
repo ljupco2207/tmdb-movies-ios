@@ -5,7 +5,7 @@ struct MovieCardView: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
-            TMDBImageView(path: movie.backdropPath)
+            TMDBImageView(path: movie.backdropPath, kind: .backdrop)
                 .aspectRatio(16 / 9, contentMode: .fit)
 
             VStack(alignment: .leading, spacing: 6) {

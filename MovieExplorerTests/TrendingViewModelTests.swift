@@ -5,8 +5,8 @@ import Testing
 struct TrendingViewModelTests {
     @Test func loadsPagesInOrder() async {
         let viewModel = TrendingViewModel(api: mockAPI(pages: [
-            1: MoviePage(page: 1, totalPages: 2, results: [movie(1), movie(2)]),
-            2: MoviePage(page: 2, totalPages: 2, results: [movie(3)])
+            1: Page(page: 1, totalPages: 2, results: [movie(1), movie(2)]),
+            2: Page(page: 2, totalPages: 2, results: [movie(3)])
         ]))
 
         await viewModel.loadNextPage()
@@ -18,7 +18,7 @@ struct TrendingViewModelTests {
 
     @Test func stopsAfterLastPage() async {
         let viewModel = TrendingViewModel(api: mockAPI(pages: [
-            1: MoviePage(page: 1, totalPages: 1, results: [movie(1)])
+            1: Page(page: 1, totalPages: 1, results: [movie(1)])
         ]))
 
         await viewModel.loadNextPage()
@@ -30,8 +30,8 @@ struct TrendingViewModelTests {
 
     @Test func removesDuplicatesAcrossPages() async {
         let viewModel = TrendingViewModel(api: mockAPI(pages: [
-            1: MoviePage(page: 1, totalPages: 2, results: [movie(1), movie(2)]),
-            2: MoviePage(page: 2, totalPages: 2, results: [movie(2), movie(3)])
+            1: Page(page: 1, totalPages: 2, results: [movie(1), movie(2)]),
+            2: Page(page: 2, totalPages: 2, results: [movie(2), movie(3)])
         ]))
 
         await viewModel.loadNextPage()
@@ -51,7 +51,7 @@ struct TrendingViewModelTests {
         #expect(!viewModel.isLoading)
     }
 
-    private func mockAPI(pages: [Int: MoviePage]) -> MockAPIClient {
+    private func mockAPI(pages: [Int: Page<Movie>]) -> MockAPIClient {
         MockAPIClient { endpoint in
             guard case .trending(let page) = endpoint, let result = pages[page] else { throw APIError.badStatus(500) }
             return result

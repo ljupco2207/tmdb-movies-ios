@@ -35,7 +35,7 @@ private struct DetailsContent: View {
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 16) {
-                TMDBImageView(path: details.backdropPath)
+                TMDBImageView(path: details.backdropPath, kind: .backdrop)
                     .aspectRatio(16 / 9, contentMode: .fit)
 
                 VStack(alignment: .leading, spacing: 20) {

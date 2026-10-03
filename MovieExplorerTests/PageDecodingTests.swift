@@ -2,9 +2,9 @@ import Foundation
 @testable import MovieExplorer
 import Testing
 
-struct MoviePageDecodingTests {
+struct PageDecodingTests {
     @Test func decodesTrendingPage() throws {
-        let page = try APIClient.decode(MoviePage.self, from: Data(SampleResponses.trendingPage.utf8))
+        let page = try APIClient.decode(Page<Movie>.self, from: Data(SampleResponses.trendingPage.utf8))
 
         #expect(page.page == 1)
         #expect(page.totalPages == 500)
@@ -16,7 +16,7 @@ struct MoviePageDecodingTests {
 
     @Test func invalidJSONThrowsDecodingError() {
         #expect(throws: APIError.decoding) {
-            try APIClient.decode(MoviePage.self, from: Data("{}".utf8))
+            try APIClient.decode(Page<Movie>.self, from: Data("{}".utf8))
         }
     }
 }

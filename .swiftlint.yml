@@ -25,3 +25,6 @@ line_length:
   warning: 140              # default 120 is tight for SwiftUI modifier chains
   error: 200
   ignores_urls: true
+
+identifier_name:
+  excluded: [id, tv]        # Identifiable's id, TMDB's "tv" media type
