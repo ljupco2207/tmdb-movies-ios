@@ -1,29 +1,31 @@
-import Foundation
 @testable import MovieExplorer
-import Testing
+import XCTest
 
-struct APIClientTests {
-    @Test func requestHasBearerTokenAndJSONHeaders() throws {
+final class APIClientTests: XCTestCase {
+    func testRequestHasBearerTokenAndJSONHeaders() throws {
         let request = try APIClient().makeRequest(for: .trending(page: 1))
 
-        #expect(request.value(forHTTPHeaderField: "Authorization") == "Bearer \(APIConfig.accessToken)")
-        #expect(request.value(forHTTPHeaderField: "Accept") == "application/json")
+        XCTAssertEqual(request.value(forHTTPHeaderField: "Authorization"), "Bearer \(APIConfig.accessToken)")
+        XCTAssertEqual(request.value(forHTTPHeaderField: "Accept"), "application/json")
     }
 
-    @Test func successfulResponseIsDecoded() async throws {
+    func testSuccessfulResponseIsDecoded() async throws {
         let client = APIClient(session: MockNetworkSession(status: 200, body: SampleResponses.trendingPage))
 
         let page: Page<Movie> = try await client.request(.trending(page: 1))
 
-        #expect(page.totalPages == 500)
-        #expect(page.results.first?.title == "Digger")
+        XCTAssertEqual(page.totalPages, 500)
+        XCTAssertEqual(page.results.first?.title, "Digger")
     }
 
-    @Test func nonSuccessStatusThrowsBadStatus() async {
+    func testNonSuccessStatusThrowsBadStatus() async {
         let client = APIClient(session: MockNetworkSession(status: 404))
 
-        await #expect(throws: APIError.badStatus(404)) {
+        do {
             let _: Page<Movie> = try await client.request(.trending(page: 1))
+            XCTFail("Expected badStatus(404)")
+        } catch {
+            XCTAssertEqual(error as? APIError, .badStatus(404))
         }
     }
 }
