@@ -1,0 +1,10 @@
+// Prod environment, used by the Release configuration ("MovieExplorer Prod" scheme).
+
+APP_DISPLAY_NAME = MovieExplorer
+BUNDLE_ID_SUFFIX =
+
+API_BASE_URL = https:/$()/api.themoviedb.org/3
+IMAGE_BASE_URL = https:/$()/image.tmdb.org/t/p
+
+// Committed on purpose so reviewers can run the app; regenerate it after the review.
+API_ACCESS_TOKEN = eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiJiZGZjZDFiYjVlYTcxYjgxODk0YTQ5NDEyZmFlMTJkOSIsIm5iZiI6MTc5MDg5NTkyOC45NDgsInN1YiI6IjZhYmVlNzM4OTY4OGIxZmZjMDg5ZDFhNyIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.EGhgvKZInd4tKqbUUhgM2p3FXdCjOEBT_PnBpSzim_8

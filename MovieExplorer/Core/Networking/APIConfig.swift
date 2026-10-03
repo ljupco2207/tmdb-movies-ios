@@ -1,9 +1,22 @@
 import Foundation
 
-/// Token committed on purpose so reviewers can run the app; regenerate it after the review.
+/// Values come from Config/Dev.xcconfig or Config/Prod.xcconfig via Info.plist; the scheme picks which.
 nonisolated enum APIConfig {
-    static let baseURL = URL(string: "https://api.themoviedb.org/3")!
-    static let imageBaseURL = URL(string: "https://image.tmdb.org/t/p")!
-    // swiftlint:disable:next line_length
-    static let accessToken = "eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiJiZGZjZDFiYjVlYTcxYjgxODk0YTQ5NDEyZmFlMTJkOSIsIm5iZiI6MTc5MDg5NTkyOC45NDgsInN1YiI6IjZhYmVlNzM4OTY4OGIxZmZjMDg5ZDFhNyIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.EGhgvKZInd4tKqbUUhgM2p3FXdCjOEBT_PnBpSzim_8"
+    static let baseURL = url(for: "APIBaseURL")
+    static let imageBaseURL = url(for: "ImageBaseURL")
+    static let accessToken = value(for: "APIAccessToken")
+
+    private static func value(for key: String) -> String {
+        guard let value = Bundle.main.object(forInfoDictionaryKey: key) as? String, !value.isEmpty else {
+            fatalError("\(key) is missing from Info.plist; check Config/*.xcconfig")
+        }
+        return value
+    }
+
+    private static func url(for key: String) -> URL {
+        guard let url = URL(string: value(for: key)) else {
+            fatalError("\(key) is not a valid URL; check Config/*.xcconfig")
+        }
+        return url
+    }
 }
