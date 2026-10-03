@@ -5,7 +5,7 @@ struct MovieCardView: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
-            imagePlaceholder
+            TMDBImageView(path: movie.backdropPath)
                 .aspectRatio(16 / 9, contentMode: .fit)
 
             VStack(alignment: .leading, spacing: 6) {
@@ -25,15 +25,5 @@ struct MovieCardView: View {
         }
         .background(Color(.secondarySystemGroupedBackground))
         .clipShape(.rect(cornerRadius: 12))
-    }
-
-    private var imagePlaceholder: some View {
-        Rectangle()
-            .fill(Color(.tertiarySystemFill))
-            .overlay {
-                Image(systemName: "film")
-                    .font(.title)
-                    .foregroundStyle(.tertiary)
-            }
     }
 }
