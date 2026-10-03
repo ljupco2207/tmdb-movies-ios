@@ -28,4 +28,9 @@ nonisolated enum TMDBImage {
             .appending(path: size(forPixelWidth: pixelWidth, kind: kind))
             .appending(path: path)
     }
+
+    /// Smallest size, shown blurred while the full image loads.
+    static func previewURL(path: String?, kind: Kind) -> URL? {
+        url(path: path, kind: kind, pixelWidth: 1)
+    }
 }

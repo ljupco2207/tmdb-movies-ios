@@ -32,4 +32,10 @@ struct TMDBImageTests {
         #expect(TMDBImage.url(path: nil, kind: .backdrop, pixelWidth: 1110) == nil)
         #expect(TMDBImage.url(path: "/abc.jpg", kind: .backdrop, pixelWidth: 0) == nil)
     }
+
+    @Test func previewUsesSmallestSize() {
+        #expect(TMDBImage.previewURL(path: "/abc.jpg", kind: .backdrop)?.absoluteString == "https://image.tmdb.org/t/p/w300/abc.jpg")
+        #expect(TMDBImage.previewURL(path: "/abc.jpg", kind: .poster)?.absoluteString == "https://image.tmdb.org/t/p/w92/abc.jpg")
+        #expect(TMDBImage.previewURL(path: nil, kind: .backdrop) == nil)
+    }
 }

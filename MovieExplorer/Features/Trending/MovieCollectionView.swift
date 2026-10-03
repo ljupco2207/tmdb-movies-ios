@@ -128,8 +128,9 @@ struct MovieCollectionView<Footer: View>: UIViewRepresentable {
 
         func collectionView(_ collectionView: UICollectionView, prefetchItemsAt indexPaths: [IndexPath]) {
             for indexPath in indexPaths {
-                guard let url = imageURL(at: indexPath, in: collectionView) else { continue }
-                let prefetcher = ImagePrefetcher(urls: [url])
+                let urls = imageURLs(at: indexPath, in: collectionView)
+                guard !urls.isEmpty else { continue }
+                let prefetcher = ImagePrefetcher(urls: urls)
                 prefetchers[indexPath] = prefetcher
                 prefetcher.start()
             }
@@ -141,13 +142,15 @@ struct MovieCollectionView<Footer: View>: UIViewRepresentable {
             }
         }
 
-        /// The same URL the card's image view will request, so the prefetched image is a cache hit.
-        private func imageURL(at indexPath: IndexPath, in collectionView: UICollectionView) -> URL? {
-            guard let movie = dataSource?.itemIdentifier(for: indexPath) else { return nil }
+        /// The same URLs the card's image view will request (preview first), so prefetched images are cache hits.
+        private func imageURLs(at indexPath: IndexPath, in collectionView: UICollectionView) -> [URL] {
+            guard let movie = dataSource?.itemIdentifier(for: indexPath) else { return [] }
             let cardWidth = collectionView.collectionViewLayout.layoutAttributesForItem(at: indexPath)?.size.width
                 ?? collectionView.bounds.width
             let pixelWidth = cardWidth * collectionView.traitCollection.displayScale
-            return TMDBImage.url(path: movie.backdropPath, kind: .backdrop, pixelWidth: pixelWidth)
+            let previewURL = TMDBImage.previewURL(path: movie.backdropPath, kind: .backdrop)
+            let url = TMDBImage.url(path: movie.backdropPath, kind: .backdrop, pixelWidth: pixelWidth)
+            return (previewURL == url ? [url] : [previewURL, url]).compactMap { $0 }
         }
     }
 }
