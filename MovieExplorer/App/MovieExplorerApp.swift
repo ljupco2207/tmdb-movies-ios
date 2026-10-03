@@ -17,14 +17,7 @@ struct MovieExplorerApp: App {
 
     var body: some Scene {
         WindowGroup {
-            TrendingView(api: api, favorites: favorites)
-                .overlay(alignment: .bottom) {
-                    if !network.isConnected {
-                        OfflineBanner()
-                            .transition(.move(edge: .bottom).combined(with: .opacity))
-                    }
-                }
-                .animation(.easeInOut, value: network.isConnected)
+            RootView(api: api, favorites: favorites, network: network)
         }
     }
 

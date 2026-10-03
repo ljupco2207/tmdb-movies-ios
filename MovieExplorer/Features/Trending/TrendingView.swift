@@ -1,56 +1,45 @@
 import SwiftUI
 
 struct TrendingView: View {
-    private let api: APIClientProtocol
     private let favorites: FavoritesStore
+    /// The collection view is UIKit, so it can't use NavigationLink; RootView pushes the route.
+    private let onOpen: (MediaRoute) -> Void
     @State private var viewModel: TrendingViewModel
-    @State private var path = NavigationPath()
 
-    init(api: APIClientProtocol, favorites: FavoritesStore) {
-        self.api = api
+    init(api: APIClientProtocol, favorites: FavoritesStore, onOpen: @escaping (MediaRoute) -> Void) {
         self.favorites = favorites
+        self.onOpen = onOpen
         _viewModel = State(initialValue: TrendingViewModel(api: api))
     }
 
     var body: some View {
-        NavigationStack(path: $path) {
-            MovieCollectionView(
-                movies: viewModel.movies,
-                favorites: favorites,
-                onReachEnd: loadNextPage,
-                onSelect: { path.append(MediaRoute(id: $0.id, type: .movie)) },
-                footer: { PagingFooter(viewModel: viewModel, retry: loadNextPage) }
-            )
-            .ignoresSafeArea()
-            .overlay { loadingOrError }
-            .navigationTitle("Trending")
-            .navigationDestination(for: MediaRoute.self) { route in
-                DetailsView(route: route, api: api, favorites: favorites)
-            }
-            .navigationDestination(for: SearchRoute.self) { _ in
-                SearchView(api: api, favorites: favorites)
-            }
-            .navigationDestination(for: FavoritesRoute.self) { _ in
-                FavoritesView(favorites: favorites)
-            }
-            .toolbar {
-                ToolbarItem(placement: .topBarTrailing) {
-                    NavigationLink(value: FavoritesRoute()) {
-                        Image(systemName: "heart")
-                    }
-                    .accessibilityLabel("Favorites")
+        MovieCollectionView(
+            movies: viewModel.movies,
+            favorites: favorites,
+            onReachEnd: loadNextPage,
+            onSelect: { onOpen(MediaRoute(id: $0.id, type: .movie)) },
+            footer: { PagingFooter(viewModel: viewModel, retry: loadNextPage) }
+        )
+        .ignoresSafeArea()
+        .overlay { loadingOrError }
+        .navigationTitle("Trending")
+        .toolbar {
+            ToolbarItem(placement: .topBarTrailing) {
+                NavigationLink(value: FavoritesRoute()) {
+                    Image(systemName: "heart")
                 }
-                ToolbarItem(placement: .topBarTrailing) {
-                    NavigationLink(value: SearchRoute()) {
-                        Image(systemName: "magnifyingglass")
-                    }
-                    .accessibilityLabel("Search")
-                }
+                .accessibilityLabel("Favorites")
             }
-            .task {
-                if viewModel.movies.isEmpty {
-                    await viewModel.loadNextPage()
+            ToolbarItem(placement: .topBarTrailing) {
+                NavigationLink(value: SearchRoute()) {
+                    Image(systemName: "magnifyingglass")
                 }
+                .accessibilityLabel("Search")
+            }
+        }
+        .task {
+            if viewModel.movies.isEmpty {
+                await viewModel.loadNextPage()
             }
         }
     }
