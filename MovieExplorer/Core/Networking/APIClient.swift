@@ -20,9 +20,19 @@ nonisolated final class APIClient: APIClientProtocol {
     /// Runs off the main actor, so JSON decoding never happens on the main thread.
     @concurrent
     func request<T: Decodable & Sendable>(_ endpoint: Endpoint) async throws -> T {
-        let (data, response) = try await session.send(makeRequest(for: endpoint))
+        let request = try makeRequest(for: endpoint)
+        let start = ContinuousClock.now
+        let data: Data
+        let response: URLResponse
+        do {
+            (data, response) = try await session.send(request)
+        } catch {
+            NetworkLogger.log(request, error: error)
+            throw error
+        }
 
         let statusCode = (response as? HTTPURLResponse)?.statusCode ?? -1
+        NetworkLogger.log(request, statusCode: statusCode, duration: ContinuousClock.now - start)
         guard (200..<300).contains(statusCode) else {
             throw APIError.badStatus(statusCode)
         }
@@ -45,6 +55,7 @@ nonisolated final class APIClient: APIClientProtocol {
         do {
             return try decoder.decode(type, from: data)
         } catch {
+            NetworkLogger.log(decodingError: error, type: type)
             throw APIError.decoding
         }
     }
