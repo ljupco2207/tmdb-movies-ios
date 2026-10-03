@@ -1,3 +1,4 @@
+import Kingfisher
 import SwiftUI
 import UIKit
 
@@ -20,6 +21,7 @@ struct MovieCollectionView<Footer: View>: UIViewRepresentable {
         collectionView.backgroundColor = .systemGroupedBackground
         collectionView.accessibilityIdentifier = "trending.list"
         collectionView.delegate = context.coordinator
+        collectionView.prefetchDataSource = context.coordinator
         context.coordinator.configureDataSource(for: collectionView)
         return collectionView
     }
@@ -68,9 +70,10 @@ struct MovieCollectionView<Footer: View>: UIViewRepresentable {
         return section
     }
 
-    final class Coordinator: NSObject, UICollectionViewDelegate {
+    final class Coordinator: NSObject, UICollectionViewDelegate, UICollectionViewDataSourcePrefetching {
         var parent: MovieCollectionView
         private var dataSource: UICollectionViewDiffableDataSource<Int, Movie>?
+        private var prefetchers: [IndexPath: ImagePrefetcher] = [:]
 
         init(parent: MovieCollectionView) {
             self.parent = parent
@@ -111,6 +114,7 @@ struct MovieCollectionView<Footer: View>: UIViewRepresentable {
         }
 
         func collectionView(_ collectionView: UICollectionView, willDisplay cell: UICollectionViewCell, forItemAt indexPath: IndexPath) {
+            prefetchers[indexPath] = nil
             if indexPath.item >= parent.movies.count - MovieCollectionView.loadMoreThreshold {
                 parent.onReachEnd()
             }
@@ -120,6 +124,30 @@ struct MovieCollectionView<Footer: View>: UIViewRepresentable {
             collectionView.deselectItem(at: indexPath, animated: true)
             guard let movie = dataSource?.itemIdentifier(for: indexPath) else { return }
             parent.onSelect(movie)
+        }
+
+        func collectionView(_ collectionView: UICollectionView, prefetchItemsAt indexPaths: [IndexPath]) {
+            for indexPath in indexPaths {
+                guard let url = imageURL(at: indexPath, in: collectionView) else { continue }
+                let prefetcher = ImagePrefetcher(urls: [url])
+                prefetchers[indexPath] = prefetcher
+                prefetcher.start()
+            }
+        }
+
+        func collectionView(_ collectionView: UICollectionView, cancelPrefetchingForItemsAt indexPaths: [IndexPath]) {
+            for indexPath in indexPaths {
+                prefetchers.removeValue(forKey: indexPath)?.stop()
+            }
+        }
+
+        /// The same URL the card's image view will request, so the prefetched image is a cache hit.
+        private func imageURL(at indexPath: IndexPath, in collectionView: UICollectionView) -> URL? {
+            guard let movie = dataSource?.itemIdentifier(for: indexPath) else { return nil }
+            let cardWidth = collectionView.collectionViewLayout.layoutAttributesForItem(at: indexPath)?.size.width
+                ?? collectionView.bounds.width
+            let pixelWidth = cardWidth * collectionView.traitCollection.displayScale
+            return TMDBImage.url(path: movie.backdropPath, kind: .backdrop, pixelWidth: pixelWidth)
         }
     }
 }
