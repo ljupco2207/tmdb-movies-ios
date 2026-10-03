@@ -5,6 +5,7 @@ import UIKit
 struct MovieCollectionView<Footer: View>: UIViewRepresentable {
     let movies: [Movie]
     let onReachEnd: () -> Void
+    let onSelect: (Movie) -> Void
     @ViewBuilder let footer: () -> Footer
 
     /// Start loading the next page when this many items are left to display.
@@ -93,6 +94,12 @@ struct MovieCollectionView<Footer: View>: UIViewRepresentable {
             if indexPath.item >= parent.movies.count - MovieCollectionView.loadMoreThreshold {
                 parent.onReachEnd()
             }
+        }
+
+        func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+            collectionView.deselectItem(at: indexPath, animated: true)
+            guard let movie = dataSource?.itemIdentifier(for: indexPath) else { return }
+            parent.onSelect(movie)
         }
     }
 }

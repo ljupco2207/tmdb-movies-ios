@@ -22,4 +22,22 @@ enum SampleResponses {
       ]
     }
     """
+
+    static let movieDetails = """
+    {
+      "id": 1, "title": "Digger", "tagline": "A man. A plan.", "overview": "Story",
+      "backdrop_path": "/b.jpg", "release_date": "2026-09-28", "runtime": 129, "status": "Released",
+      "vote_average": 7.4, "vote_count": 24, "genres": [{"id": 35, "name": "Comedy"}],
+      "credits": {
+        "cast": [{"credit_id": "c1", "name": "Tom Cruise", "character": "Digger"}],
+        "crew": [
+          {"name": "A. Director", "job": "Director", "department": "Directing"},
+          {"name": "A. Director", "job": "Screenplay", "department": "Writing"},
+          {"name": "B. Writer", "job": "Story", "department": "Writing"},
+          {"name": "B. Writer", "job": "Screenplay", "department": "Writing"},
+          {"name": "C. Editor", "job": "Editor", "department": "Editing"}
+        ]
+      }
+    }
+    """
 }

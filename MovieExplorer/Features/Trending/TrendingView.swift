@@ -1,20 +1,29 @@
 import SwiftUI
 
 struct TrendingView: View {
+    private let api: APIClientProtocol
     @State private var viewModel: TrendingViewModel
+    @State private var path: [Movie] = []
 
     init(api: APIClientProtocol) {
+        self.api = api
         _viewModel = State(initialValue: TrendingViewModel(api: api))
     }
 
     var body: some View {
-        NavigationStack {
-            MovieCollectionView(movies: viewModel.movies, onReachEnd: loadNextPage) {
-                PagingFooter(viewModel: viewModel, retry: loadNextPage)
-            }
+        NavigationStack(path: $path) {
+            MovieCollectionView(
+                movies: viewModel.movies,
+                onReachEnd: loadNextPage,
+                onSelect: { path.append($0) },
+                footer: { PagingFooter(viewModel: viewModel, retry: loadNextPage) }
+            )
             .ignoresSafeArea()
             .overlay { loadingOrError }
             .navigationTitle("Trending")
+            .navigationDestination(for: Movie.self) { movie in
+                DetailsView(movieID: movie.id, api: api)
+            }
             .task {
                 if viewModel.movies.isEmpty {
                     await viewModel.loadNextPage()
@@ -27,11 +36,7 @@ struct TrendingView: View {
     private var loadingOrError: some View {
         if viewModel.movies.isEmpty {
             if let errorMessage = viewModel.errorMessage {
-                ContentUnavailableView {
-                    Label(errorMessage, systemImage: "wifi.exclamationmark")
-                } actions: {
-                    Button("Retry", action: loadNextPage)
-                }
+                ErrorStateView(message: errorMessage, retry: loadNextPage)
             } else {
                 ProgressView()
             }
