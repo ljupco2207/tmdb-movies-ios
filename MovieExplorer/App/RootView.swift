@@ -1,11 +1,13 @@
 import SwiftUI
 
 struct RootView: View {
-    let api: APIClientProtocol
-    let favorites: FavoritesStore
-    let network: NetworkMonitor
+    let dependencies: AppDependencies
 
     @State private var path = NavigationPath()
+
+    private var api: APIClientProtocol { dependencies.api }
+    private var favorites: FavoritesStore { dependencies.favorites }
+    private var network: NetworkMonitor { dependencies.network }
 
     var body: some View {
         NavigationStack(path: $path) {
