@@ -12,9 +12,20 @@ nonisolated protocol APIClientProtocol: Sendable {
 
 nonisolated final class APIClient: APIClientProtocol {
     private let session: NetworkSession
+    private let cache: ResponseCache?
 
-    init(session: NetworkSession = URLSession.shared) {
+    private static let offlineErrors: Set<URLError.Code> = [
+        .notConnectedToInternet,
+        .networkConnectionLost,
+        .cannotConnectToHost,
+        .cannotFindHost,
+        .timedOut,
+        .dataNotAllowed
+    ]
+
+    init(session: NetworkSession = URLSession.shared, cache: ResponseCache? = ResponseCache()) {
         self.session = session
+        self.cache = cache
     }
 
     /// Runs off the main actor, so JSON decoding never happens on the main thread.
@@ -26,6 +37,10 @@ nonisolated final class APIClient: APIClientProtocol {
         let response: URLResponse
         do {
             (data, response) = try await session.send(request)
+        } catch let error as URLError where Self.offlineErrors.contains(error.code) {
+            NetworkLogger.log(request, error: error)
+            guard let url = request.url, let saved = cache?.data(for: url) else { throw error }
+            return try Self.decode(T.self, from: saved)
         } catch {
             NetworkLogger.log(request, error: error)
             throw error
@@ -37,7 +52,11 @@ nonisolated final class APIClient: APIClientProtocol {
             throw APIError.badStatus(statusCode)
         }
 
-        return try Self.decode(T.self, from: data)
+        let decoded = try Self.decode(T.self, from: data)
+        if let url = request.url {
+            cache?.save(data, for: url)
+        }
+        return decoded
     }
 
     func makeRequest(for endpoint: Endpoint) throws -> URLRequest {
