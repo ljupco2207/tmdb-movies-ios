@@ -11,14 +11,12 @@ struct MovieCardView: View {
             VStack(alignment: .leading, spacing: 6) {
                 Text(movie.title)
                     .font(.headline)
-                    .lineLimit(2)
+                    .lineLimit(2, reservesSpace: true)
 
-                if !movie.overview.isEmpty {
-                    Text(movie.overview)
-                        .font(.subheadline)
-                        .foregroundStyle(.secondary)
-                        .lineLimit(3)
-                }
+                Text(movie.overview)
+                    .font(.subheadline)
+                    .foregroundStyle(.secondary)
+                    .lineLimit(3, reservesSpace: true)
             }
             .frame(maxWidth: .infinity, alignment: .leading)
             .padding(12)

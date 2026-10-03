@@ -28,14 +28,33 @@ struct MovieCollectionView<Footer: View>: UIViewRepresentable {
         context.coordinator.apply(movies)
     }
 
+    /// Column count follows from the width: 1 on iPhone portrait, 2-4 in landscape and on iPad.
+    private static var minimumCardWidth: CGFloat { 320 }
+    private static var spacing: CGFloat { 16 }
+
     private static func makeLayout() -> UICollectionViewLayout {
-        let size = NSCollectionLayoutSize(widthDimension: .fractionalWidth(1), heightDimension: .estimated(320))
-        let item = NSCollectionLayoutItem(layoutSize: size)
-        let group = NSCollectionLayoutGroup.vertical(layoutSize: size, subitems: [item])
+        UICollectionViewCompositionalLayout { _, environment in
+            let availableWidth = environment.container.effectiveContentSize.width - 2 * spacing
+            let columns = max(1, Int((availableWidth + spacing) / (minimumCardWidth + spacing)))
+            let cardWidth = (availableWidth - CGFloat(columns - 1) * spacing) / CGFloat(columns)
+            return makeSection(cardWidth: cardWidth)
+        }
+    }
+
+    private static func makeSection(cardWidth: CGFloat) -> NSCollectionLayoutSection {
+        let estimatedHeight = cardWidth * 9 / 16 + 130
+        let item = NSCollectionLayoutItem(
+            layoutSize: NSCollectionLayoutSize(widthDimension: .absolute(cardWidth), heightDimension: .estimated(estimatedHeight))
+        )
+        let group = NSCollectionLayoutGroup.horizontal(
+            layoutSize: NSCollectionLayoutSize(widthDimension: .fractionalWidth(1), heightDimension: .estimated(estimatedHeight)),
+            subitems: [item]
+        )
+        group.interItemSpacing = .fixed(spacing)
 
         let section = NSCollectionLayoutSection(group: group)
-        section.interGroupSpacing = 16
-        section.contentInsets = NSDirectionalEdgeInsets(top: 8, leading: 16, bottom: 16, trailing: 16)
+        section.interGroupSpacing = spacing
+        section.contentInsets = NSDirectionalEdgeInsets(top: 8, leading: spacing, bottom: spacing, trailing: spacing)
 
         let footerSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(1), heightDimension: .absolute(60))
         section.boundarySupplementaryItems = [
@@ -45,7 +64,7 @@ struct MovieCollectionView<Footer: View>: UIViewRepresentable {
                 alignment: .bottom
             )
         ]
-        return UICollectionViewCompositionalLayout(section: section)
+        return section
     }
 
     final class Coordinator: NSObject, UICollectionViewDelegate {
